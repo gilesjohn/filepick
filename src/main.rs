@@ -77,6 +77,11 @@ fn pick(options: PickOptions) {
 }
 
 fn main() {
+    if env::args().any(|a| a == "help" || a == "--help" || a == "-h") {
+        println!("Usage: filepick [start_path] [--copy-to-cwd] [--overwrite] [--null]");
+        return;
+    }
+
     let options = parse_args(env::args().collect());
     pick(options);
 }
