@@ -14,6 +14,8 @@ Explicit path to an existing built filepick.exe.
 Explicit target installation directory.
 .PARAMETER CommandName
 Executable name to install (default: filepick).
+.PARAMETER TemplateDir
+Path to a template directory to pass to the program when invoked from Explorer.
 #>
 [CmdletBinding()]
 param(
@@ -21,7 +23,8 @@ param(
     [switch]$AddExplorerContextMenu,
     [string]$ExePath,
     [string]$InstallDir,
-    [string]$CommandName = "filepick"
+    [string]$CommandName = "filepick",
+    [string]$TemplateDir
 )
 
 Set-StrictMode -Version Latest
@@ -74,17 +77,27 @@ function Add-DirectoryToPath {
 }
 
 function Create-ContextMenuEntry {
-    param([string]$exePath)
+    param(
+        [string]$exePath,
+        [string]$templateDir
+    )
 
     $rootKey = "HKCU:\Software\Classes\Directory\Background\shell\$CommandName"
     $commandKeyPath = "$rootKey\command"
 
     New-Item -Path "$rootKey" -Force | Out-Null
     Set-ItemProperty -Path "$rootKey" -Name 'MUIVerb' -Value $CommandName -Force
-    Set-ItemProperty -Path "$rootKey" -Name 'Icon' -Value $exePath -Force
+    # TODO: Use a dedicated custom icon for the Explorer context menu entry.
+    Set-ItemProperty -Path "$rootKey" -Name 'Icon' -Value 'shell32.dll,70' -Force
+
+    if ($templateDir) {
+        $commandValue = "`"$exePath`" `"$templateDir`""
+    } else {
+        $commandValue = "`"$exePath`" `"%V`""
+    }
 
     New-Item -Path "$commandKeyPath" -Force | Out-Null
-    Set-Item -Path "$commandKeyPath" -Value "`"$exePath`" `"%V`"" -Force
+    Set-Item -Path "$commandKeyPath" -Value $commandValue -Force
     Write-Host "Created Explorer background context menu entry at $commandKeyPath"
 }
 
@@ -111,7 +124,7 @@ if ($AddToPath) {
 }
 
 if ($AddExplorerContextMenu) {
-    Create-ContextMenuEntry -exePath $targetExe
+    Create-ContextMenuEntry -exePath $targetExe -templateDir $TemplateDir
     Write-Host "Restart File Explorer or log out and back in to see the new context menu entry."
 }
 

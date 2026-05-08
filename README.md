@@ -34,8 +34,8 @@ Usage examples:
 # Install for current user in LocalAppData and add it to PATH
 pwsh .\install.ps1 -AddToPath
 
-# Install for current user and add a background context menu entry
-pwsh .\install.ps1 -AddExplorerContextMenu -CommandName "Add Template"
+# Install for current user and add a background context menu entry that always opens a specific template directory
+pwsh .\install.ps1 -AddExplorerContextMenu -CommandName "Add Template" -TemplateDir "C:\path\to\templates"
 
 # Install from a custom built executable path into a custom directory and add to PATH
 pwsh .\install.ps1 -ExePath .\target\release\filepick.exe -InstallDir %USERPROFILE%\Tools\FilePick -AddToPath
