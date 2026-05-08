@@ -37,8 +37,8 @@ function Resolve-SourceExe {
     }
 
     $candidates = @(
-        Join-Path $PSScriptRoot "target\release\$CommandName.exe",
-        Join-Path $PSScriptRoot "target\debug\$CommandName.exe"
+        Join-Path $PSScriptRoot "target\release\filepick.exe"
+        Join-Path $PSScriptRoot "target\debug\filepick.exe"
     )
 
     foreach ($candidate in $candidates) {
