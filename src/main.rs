@@ -1,3 +1,5 @@
+#![cfg_attr(feature = "no_terminal", windows_subsystem = "windows")]
+
 use std::{
     env::{self},
     fs,
@@ -23,10 +25,18 @@ fn parse_args(args: Vec<String>) -> PickOptions {
         .unwrap_or_else(|| ".".into());
 
     // If true, copy selected files to working directory
-    let cwd_copy = args.iter().any(|a| a == "--copy-to-cwd");
+    let cwd_copy = if cfg!(feature = "default_copy") {
+        true
+    } else {
+        args.iter().any(|a| a == "--copy-to-cwd")
+    };
 
     // If true, overwrite existing files when copying
-    let overwrite = args.iter().any(|a| a == "--overwrite");
+    let overwrite = if cfg!(feature = "always_copy") {
+        true
+    } else {
+        args.iter().any(|a| a == "--overwrite")
+    };
 
     // If true, separate file names with NULL character instead of line feed
     let null_sep = args.iter().any(|a| a == "--null");
