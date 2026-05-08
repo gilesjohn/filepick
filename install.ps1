@@ -29,6 +29,11 @@ param(
 
 Set-StrictMode -Version Latest
 
+# Expand environment variables in path parameters, such as %USERPROFILE% or %LOCALAPPDATA%
+$ExePath = [Environment]::ExpandEnvironmentVariables($ExePath)
+$InstallDir = [Environment]::ExpandEnvironmentVariables($InstallDir)
+$TemplateDir = [Environment]::ExpandEnvironmentVariables($TemplateDir)
+
 function Resolve-SourceExe {
     param([string]$path)
 

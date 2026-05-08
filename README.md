@@ -24,6 +24,17 @@ filepick | Select-String "TODO"
 
 This program can be added to the context menu in file explorer to allow functionality similar to PowerToys New+ but with traversal of the "templates" folder. Compile with the no_terminal feature (and optionally always_copy) and then add the appropriate items to `HKCU:\Software\Classes\Directory\Background\shell` to make it appear as an option in the context menu in explorer. Create or pick a template folder and make sure to include the path as an argument in the command registry item.
 
+Recommended File Explorer installation using the installation script:
+- build release with `no_terminal` and `always_copy`
+```powershell
+cargo build --release --features no_terminal,always_copy
+```
+- install as a context menu item in File Explorer
+```powershell
+.\install.ps1 -AddExplorerContextMenu -CommandName "Add Template" -TemplateDir "%USERPROFILE%\Templates"
+```
+- now add a Templates folder in `C:\Users\{Your Username}` and put some files in here (as nested as you like) to easily add from the context menu in File Explorer
+
 ## Windows Installation Script
 
 To simplify installation on Windows, use `install.ps1`. First compile the program in release mode. Use the `no_terminal` feature to hide the visible terminal window when installing as an Explorer menu item. Then run the install script with the desired options.
@@ -32,13 +43,13 @@ Usage examples:
 
 ```powershell
 # Install for current user in LocalAppData and add it to PATH
-pwsh .\install.ps1 -AddToPath
+.\install.ps1 -AddToPath
 
 # Install for current user and add a background context menu entry that always opens a specific template directory
-pwsh .\install.ps1 -AddExplorerContextMenu -CommandName "Add Template" -TemplateDir "C:\path\to\templates"
+.\install.ps1 -AddExplorerContextMenu -CommandName "Add Template" -TemplateDir "C:\path\to\templates"
 
 # Install from a custom built executable path into a custom directory and add to PATH
-pwsh .\install.ps1 -ExePath .\target\release\filepick.exe -InstallDir %USERPROFILE%\Tools\FilePick -AddToPath
+.\install.ps1 -ExePath .\target\release\filepick.exe -InstallDir %USERPROFILE%\Tools\FilePick -AddToPath
 ```
 
 ## Features
