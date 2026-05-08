@@ -22,7 +22,24 @@ filepick | Select-String "TODO"
 
 ## File Explorer
 
-This program can be added to the context menu in file explorer to allow functionality similar to PowerToys New+ but with traversal of the "templates" folder. Compile with the no_terminal feature (and optionally always_copy) and then add the appropriate items to `HKEY_CLASSES_ROOT\Directory\Background\shell` to make it appear as an option in the context menu in explorer. Create or pick a template folder and make sure to include the path as an argument in the command registry item.
+This program can be added to the context menu in file explorer to allow functionality similar to PowerToys New+ but with traversal of the "templates" folder. Compile with the no_terminal feature (and optionally always_copy) and then add the appropriate items to `HKCU:\Software\Classes\Directory\Background\shell` to make it appear as an option in the context menu in explorer. Create or pick a template folder and make sure to include the path as an argument in the command registry item.
+
+## Windows Installation Script
+
+To simplify installation on Windows, use `install.ps1`. First compile the program in release mode. Use the `no_terminal` feature to hide the visible terminal window when installing as an Explorer menu item. Then run the install script with the desired options.
+
+Usage examples:
+
+```powershell
+# Install for current user in LocalAppData and add it to PATH
+pwsh .\install.ps1 -AddToPath
+
+# Install for current user and add a background context menu entry
+pwsh .\install.ps1 -AddExplorerContextMenu -CommandName "Add Template"
+
+# Install from a custom built executable path into a custom directory and add to PATH
+pwsh .\install.ps1 -ExePath .\target\release\filepick.exe -InstallDir %USERPROFILE%\Tools\FilePick -AddToPath
+```
 
 ## Features
 
