@@ -1,35 +1,62 @@
-use std::{env, fs, path::PathBuf};
+use std::{
+    env::{self},
+    fs,
+    path::PathBuf,
+};
 
 use rfd::FileDialog;
 
-fn main() {
-    // If true, copy selected files to working directory
-    let cwd_copy = env::args().any(|a| a == "--copy-to-cwd");
+struct PickOptions {
+    start_dir: PathBuf,
+    cwd_copy: bool,
+    overwrite: bool,
+    separator: String,
+}
 
-    // If true, overwrite existing files when copying
-    let overwrite = env::args().any(|a| a == "--overwrite");
-
-    // First non-option argument will be the initial path to open in the picker
-    let start_dir = env::args()
+fn parse_args(args: Vec<String>) -> PickOptions {
+    // First non-option argument will be the initial path to open in the picker, cwd if not provided
+    let start_dir = args
+        .iter()
         .filter(|p| !p.starts_with("--"))
         .nth(1)
         .map(PathBuf::from)
         .unwrap_or_else(|| ".".into());
 
+    // If true, copy selected files to working directory
+    let cwd_copy = args.iter().any(|a| a == "--copy-to-cwd");
+
+    // If true, overwrite existing files when copying
+    let overwrite = args.iter().any(|a| a == "--overwrite");
+
+    // If true, separate file names with NULL character instead of line feed
+    let null_sep = args.iter().any(|a| a == "--null");
+    let sep = if null_sep { "\0" } else { "\n" };
+
+    PickOptions {
+        start_dir: start_dir.to_path_buf(),
+        cwd_copy,
+        overwrite,
+        separator: sep.to_owned(),
+    }
+}
+
+fn pick(options: PickOptions) {
     let file_paths = FileDialog::new()
-        .set_directory(start_dir)
+        .set_directory(options.start_dir)
         .pick_files()
         .unwrap_or_default();
 
     let cwd = env::current_dir().unwrap();
 
     for file in file_paths {
-        println!("{}", file.display());
+        print!("{}{}", file.display(), options.separator);
 
-        if cwd_copy && let Some(file_name) = file.file_name() {
+        if options.cwd_copy
+            && let Some(file_name) = file.file_name()
+        {
             let dest = cwd.join(file_name);
 
-            if !overwrite {
+            if !options.overwrite {
                 let dest_exists = fs::exists(&dest);
                 if dest_exists.is_err() || dest_exists.is_ok_and(|e| e) {
                     eprintln!("File already exists in destination: {}", dest.display());
@@ -47,4 +74,9 @@ fn main() {
             }
         }
     }
+}
+
+fn main() {
+    let options = parse_args(env::args().collect());
+    pick(options);
 }
