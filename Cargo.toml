@@ -10,3 +10,6 @@ rfd = "0.17.2"
 no_terminal = []
 default_copy = []
 always_copy = ["default_copy"]
+
+[dev-dependencies]
+tempfile = "3.27.0"
